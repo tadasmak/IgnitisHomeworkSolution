@@ -49,5 +49,20 @@ namespace IgnitisHomework.Controllers
 
             return CreatedAtAction(nameof(GetAll), new { id = newPlant.Id }, DTOs.PowerPlantDto.FromEntity(newPlant));
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var plant = _context.PowerPlants.Find(id);
+            if (plant == null)
+            {
+                return NotFound();
+            }
+
+            _context.PowerPlants.Remove(plant);
+            _context.SaveChanges();
+
+            return NoContent();
+        }
     }
 }
