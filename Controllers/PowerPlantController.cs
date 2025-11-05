@@ -29,5 +29,25 @@ namespace IgnitisHomework.Controllers
 
             return Ok(wrapper);
         }
+
+        [HttpPost]
+        public IActionResult AddPowerPlant([FromBody] PowerPlantDto plantDto)
+        {
+            if (plantDto == null)
+                return BadRequest("PowerPlant data is required");
+
+            var newPlant = new Models.PowerPlant
+            {
+                Owner = plantDto.Owner,
+                Power = plantDto.Power,
+                ValidFrom = DateTime.SpecifyKind(DateTime.Parse(plantDto.ValidFrom), DateTimeKind.Utc),
+                ValidTo = string.IsNullOrEmpty(plantDto.ValidTo) ? null : DateTime.SpecifyKind(DateTime.Parse(plantDto.ValidTo), DateTimeKind.Utc)
+            };
+
+            _context.PowerPlants.Add(newPlant);
+            _context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetAll), new { id = newPlant.Id }, DTOs.PowerPlantDto.FromEntity(newPlant));
+        }
     }
 }
