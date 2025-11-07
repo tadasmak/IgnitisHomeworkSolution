@@ -22,7 +22,7 @@ namespace IgnitisHomework.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll([FromQuery] string? owner)
+        public IActionResult GetAll([FromQuery] string? owner, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             IQueryable<Models.PowerPlant> plantsQuery = _context.PowerPlants;
 
@@ -35,11 +35,28 @@ namespace IgnitisHomework.Controllers
                 );
             }
 
+            plantsQuery = plantsQuery.OrderBy(plant => plant.Id);
+            var totalCount = plantsQuery.Count();
+
+            pageNumber = Math.Max(1, pageNumber);
+
+            var skipAmount = (pageNumber - 1) * pageSize;
+
+            plantsQuery = plantsQuery.Skip(skipAmount).Take(pageSize);
+
             var plants = plantsQuery
                 .Select(plant => DTOs.PowerPlantDto.FromEntity(plant))
                 .ToList();
 
-            var wrapper = new PowerPlantsWrapperDto { PowerPlants = plants };
+            var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
+
+            var wrapper = new PowerPlantsWrapperDto { 
+                PowerPlants = plants,
+                TotalCount = totalCount,
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                TotalPages = totalPages
+            };
 
             return Ok(wrapper);
         }
