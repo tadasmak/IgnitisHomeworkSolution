@@ -4,6 +4,7 @@ using System.Linq;
 using IgnitisHomework.Models;
 using IgnitisHomework.Data;
 using IgnitisHomework.DTOs;
+using IgnitisHomework.Helpers;
 
 using System.ComponentModel.DataAnnotations;
 
@@ -21,11 +22,22 @@ namespace IgnitisHomework.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAll([FromQuery] string? owner)
         {
-            var plants = _context.PowerPlants
-                                 .Select(plant => DTOs.PowerPlantDto.FromEntity(plant))
-                                 .ToList();
+            IQueryable<Models.PowerPlant> plantsQuery = _context.PowerPlants;
+
+            if (!string.IsNullOrWhiteSpace(owner))
+            {
+                var cleanedSearchString = StringHelpers.RemoveDiacritics(owner).ToLower().Trim();
+
+                plantsQuery = plantsQuery.Where(plant =>
+                    AppDbContext.Unaccent(plant.Owner).ToLower().Contains(cleanedSearchString)
+                );
+            }
+
+            var plants = plantsQuery
+                .Select(plant => DTOs.PowerPlantDto.FromEntity(plant))
+                .ToList();
 
             var wrapper = new PowerPlantsWrapperDto { PowerPlants = plants };
 

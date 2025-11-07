@@ -9,9 +9,16 @@ namespace IgnitisHomework.Data
 
         public DbSet<PowerPlant> PowerPlants { get; set; } = null!;
 
+        public static string Unaccent(string value)
+        {
+            throw new NotSupportedException("This method is for LINQ translation only.");
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.HasDbFunction(typeof(AppDbContext).GetMethod(nameof(Unaccent), new[] { typeof(string) })!).HasName("unaccent");
 
             modelBuilder.Entity<PowerPlant>().HasData(
                 new PowerPlant { Id = 1, Owner = "Vardenis Pavardenis", Power = 9.3, ValidFrom = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc), ValidTo = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
