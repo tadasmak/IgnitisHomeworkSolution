@@ -76,8 +76,8 @@ namespace IgnitisHomework.Controllers
                 {
                     Owner = plantDto.Owner,
                     Power = plantDto.Power ?? 0,
-                    ValidFrom = DateTime.SpecifyKind(plantDto.ValidFrom, DateTimeKind.Utc),
-                    ValidTo = plantDto.ValidTo.HasValue ? DateTime.SpecifyKind(plantDto.ValidFrom, DateTimeKind.Utc) : null
+                    ValidFrom = DateTime.SpecifyKind(plantDto.ValidFrom!.Value, DateTimeKind.Utc),
+                    ValidTo = plantDto.ValidTo.HasValue ? DateTime.SpecifyKind(plantDto.ValidTo.Value, DateTimeKind.Utc) : null
                 };
 
                 _context.PowerPlants.Add(newPlant);
