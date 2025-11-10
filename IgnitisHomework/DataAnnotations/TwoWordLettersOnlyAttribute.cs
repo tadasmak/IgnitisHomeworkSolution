@@ -4,7 +4,9 @@ public class TwoWordLettersOnlyAttribute : ValidationAttribute
 {
 	protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
 	{
-		if (value is not string ownerString)
+		var ownerString = value as string;
+
+		if (string.IsNullOrWhiteSpace(ownerString))
 		{
 			return ValidationResult.Success;
 		}
